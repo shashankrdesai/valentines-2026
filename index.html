@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>7 Days of Us</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(#ffe6ec, #fff);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  h1 {
+    margin-bottom: 8px;
+  }
+
+  .day {
+    margin-top: 24px;
+    padding: 20px;
+    border-radius: 16px;
+    background: white;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+  }
+
+  button {
+    padding: 12px 20px;
+    border-radius: 999px;
+    border: none;
+    background: #ff5c8a;
+    color: white;
+    font-size: 16px;
+    margin-top: 16px;
+  }
+
+  .game {
+    margin-top: 16px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .item {
+    font-size: 36px;
+    margin: 12px;
+    cursor: pointer;
+  }
+
+  .message {
+    margin-top: 20px;
+    font-size: 17px;
+    line-height: 1.5;
+    color: #333;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h1>💖 7 Days of Us</h1>
+  <p id="subtitle"></p>
+
+  <div class="day">
+    <h2 id="dayTitle"></h2>
+
+    <div id="game" class="game"></div>
+
+    <button id="actionBtn">Start</button>
+
+    <div id="message" class="message hidden"></div>
+  </div>
+</div>
+
+<script>
+const days = [
+  {
+    title: "🌹 Rose Day",
+    subtitle: "A small beginning",
+    game: () => `
+      <div>
+        <span class="item" onclick="win()">🌹</span>
+        <span class="item">🌸</span>
+        <span class="item">🌷</span>
+      </div>
+      <p>Tap the rose</p>
+    `,
+    message: "I just wanted to give you a rose today — and a reason to smile."
+  },
+  {
+    title: "💍 Propose Day",
+    subtitle: "Choosing you",
+    game: () => `
+      <div>
+        <span class="item" onclick="win()">💍</span>
+        <span class="item">📘</span>
+        <span class="item">☕</span>
+      </div>
+      <p>Choose what feels right</p>
+    `,
+    message: "Every day I choose you. Not because I have to — because I want to."
+  },
+  {
+    title: "🍫 Chocolate Day",
+    subtitle: "Sweet moments",
+    game: () => `
+      <div>
+        <span class="item" onclick="win()">🍫</span>
+        <span class="item">🧂</span>
+        <span class="item">🍋</span>
+      </div>
+      <p>Pick the sweetest one</p>
+    `,
+    message: "Life is sweeter with you in it."
+  },
+  {
+    title: "🧸 Teddy Day",
+    subtitle: "Comfort",
+    game: () => `
+      <div>
+        <span class="item">📦</span>
+        <span class="item" onclick="win()">🧸</span>
+        <span class="item">🪑</span>
+      </div>
+      <p>Find the teddy</p>
+    `,
+    message: "You make me feel safe being myself."
+  },
+  {
+    title: "🤝 Promise Day",
+    subtitle: "Trust",
+    game: () => `
+      <button onclick="win()">I promise</button>
+    `,
+    message: "I promise effort, honesty, and us."
+  },
+  {
+    title: "🤗 Hug Day",
+    subtitle: "Closeness",
+    game: () => `
+      <p>Hold the button for a hug</p>
+      <button onmousedown="win()">🤍 Hold</button>
+    `,
+    message: "If I could, I’d hug you right now."
+  },
+  {
+    title: "❤️ Valentine’s Day",
+    subtitle: "Us",
+    game: () => `
+      <button onclick="win()">Open my heart</button>
+    `,
+    message: "This wasn’t just a game. Will you be my Valentine?"
+  }
+];
+
+// change this to control the unlocked day (0–6)
+const todayIndex = Math.min(
+  Math.floor((new Date() - new Date("2026-02-07")) / 86400000),
+  days.length - 1
+);
+
+let currentDay = Math.max(todayIndex, 0);
+
+const titleEl = document.getElementById("dayTitle");
+const subtitleEl = document.getElementById("subtitle");
+const gameEl = document.getElementById("game");
+const btn = document.getElementById("actionBtn");
+const msg = document.getElementById("message");
+
+function loadDay() {
+  const day = days[currentDay];
+  titleEl.innerText = day.title;
+  subtitleEl.innerText = day.subtitle;
+  gameEl.innerHTML = "";
+  msg.classList.add("hidden");
+  btn.innerText = "Start";
+}
+
+function win() {
+  msg.innerText = days[currentDay].message;
+  msg.classList.remove("hidden");
+  btn.innerText = "Replay";
+}
+
+btn.onclick = () => {
+  gameEl.innerHTML = days[currentDay].game();
+};
+
+loadDay();
+</script>
+</body>
+</html>

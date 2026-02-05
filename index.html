@@ -6,199 +6,234 @@
 <title>7 Days of Us</title>
 
 <style>
-  body {
-    margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-    background: linear-gradient(#ffe6ec, #fff);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  background: linear-gradient(#ffe6ef, #fff);
+}
 
-  .app {
-    width: 100%;
-    max-width: 420px;
-    padding: 24px;
-    text-align: center;
-  }
+.app {
+  max-width: 420px;
+  margin: auto;
+  padding: 20px;
+}
 
-  h1 {
-    margin-bottom: 8px;
-  }
+h1 {
+  text-align: center;
+}
 
-  .day {
-    margin-top: 24px;
-    padding: 20px;
-    border-radius: 16px;
-    background: white;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-  }
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
 
-  button {
-    padding: 12px 20px;
-    border-radius: 999px;
-    border: none;
-    background: #ff5c8a;
-    color: white;
-    font-size: 16px;
-    margin-top: 16px;
-  }
+.card {
+  padding: 18px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 8px 20px rgba(0,0,0,.08);
+  opacity: .5;
+}
 
-  .game {
-    margin-top: 16px;
-  }
+.card.active {
+  opacity: 1;
+  border: 2px solid #ff5c8a;
+}
 
-  .hidden {
-    display: none;
-  }
+.card.done {
+  opacity: 1;
+}
 
-  .item {
-    font-size: 36px;
-    margin: 12px;
-    cursor: pointer;
-  }
+button {
+  margin-top: 12px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  background: #ff5c8a;
+  color: white;
+}
 
-  .message {
-    margin-top: 20px;
-    font-size: 17px;
-    line-height: 1.5;
-    color: #333;
-  }
+.game {
+  margin-top: 12px;
+}
+
+.rose {
+  font-size: 32px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+.message {
+  margin-top: 12px;
+  line-height: 1.5;
+}
 </style>
 </head>
 
 <body>
 <div class="app">
   <h1>💖 7 Days of Us</h1>
-  <p id="subtitle"></p>
+  <p style="text-align:center" id="progress"></p>
 
-  <div class="day">
-    <h2 id="dayTitle"></h2>
-
-    <div id="game" class="game"></div>
-
-    <button id="actionBtn">Start</button>
-
-    <div id="message" class="message hidden"></div>
-  </div>
+  <div class="days" id="days"></div>
 </div>
 
 <script>
+const START_DATE = new Date("2026-02-07"); // change if needed
+const today = new Date();
+const unlocked = Math.max(0, Math.min(
+  Math.floor((today - START_DATE) / 86400000),
+  6
+));
+
+let state = JSON.parse(localStorage.getItem("state")) || {
+  completed: Array(7).fill(false),
+  petals: 0
+};
+
 const days = [
   {
     title: "🌹 Rose Day",
-    subtitle: "A small beginning",
-    game: () => `
-      <div>
-        <span class="item" onclick="win()">🌹</span>
-        <span class="item">🌸</span>
-        <span class="item">🌷</span>
-      </div>
-      <p>Tap the rose</p>
-    `,
-    message: "I just wanted to give you a rose today — and a reason to smile."
+    game(el, done) {
+      el.innerHTML = `<p>Catch 3 roses</p>`;
+      let count = 0;
+      for (let i=0;i<5;i++){
+        const r = document.createElement("span");
+        r.className = "rose";
+        r.innerText = "🌹";
+        r.onclick = () => {
+          r.remove();
+          count++;
+          if(count === 3) done();
+        };
+        el.appendChild(r);
+      }
+    },
+    message: "A rose for you. Just because you exist."
   },
   {
     title: "💍 Propose Day",
-    subtitle: "Choosing you",
-    game: () => `
-      <div>
-        <span class="item" onclick="win()">💍</span>
-        <span class="item">📘</span>
-        <span class="item">☕</span>
-      </div>
-      <p>Choose what feels right</p>
-    `,
-    message: "Every day I choose you. Not because I have to — because I want to."
+    game(el, done) {
+      el.innerHTML = `<p>Choose what feels right</p>`;
+      ["☕","📘","💍"].forEach(i=>{
+        const s=document.createElement("span");
+        s.className="rose";
+        s.innerText=i;
+        s.onclick=()=> i==="💍" && done();
+        el.appendChild(s);
+      });
+    },
+    message: "Every day, I choose you."
   },
   {
     title: "🍫 Chocolate Day",
-    subtitle: "Sweet moments",
-    game: () => `
-      <div>
-        <span class="item" onclick="win()">🍫</span>
-        <span class="item">🧂</span>
-        <span class="item">🍋</span>
-      </div>
-      <p>Pick the sweetest one</p>
-    `,
-    message: "Life is sweeter with you in it."
+    game(el, done) {
+      el.innerHTML = `<p>Build the chocolate</p>`;
+      const b=document.createElement("button");
+      b.innerText="Mix 🍫";
+      b.onclick=done;
+      el.appendChild(b);
+    },
+    message: "Life is sweeter with you."
   },
   {
     title: "🧸 Teddy Day",
-    subtitle: "Comfort",
-    game: () => `
-      <div>
-        <span class="item">📦</span>
-        <span class="item" onclick="win()">🧸</span>
-        <span class="item">🪑</span>
-      </div>
-      <p>Find the teddy</p>
-    `,
-    message: "You make me feel safe being myself."
+    game(el, done) {
+      el.innerHTML = `<p>Find the teddy</p>`;
+      ["📦","🪑","🧸"].sort(()=>.5-Math.random()).forEach(i=>{
+        const s=document.createElement("span");
+        s.className="rose";
+        s.innerText=i;
+        s.onclick=()=> i==="🧸" && done();
+        el.appendChild(s);
+      });
+    },
+    message: "You make me feel safe."
   },
   {
     title: "🤝 Promise Day",
-    subtitle: "Trust",
-    game: () => `
-      <button onclick="win()">I promise</button>
-    `,
+    game(el, done) {
+      el.innerHTML = `<p>Tap to promise</p>`;
+      const b=document.createElement("button");
+      b.innerText="I promise";
+      b.onclick=done;
+      el.appendChild(b);
+    },
     message: "I promise effort, honesty, and us."
   },
   {
     title: "🤗 Hug Day",
-    subtitle: "Closeness",
-    game: () => `
-      <p>Hold the button for a hug</p>
-      <button onmousedown="win()">🤍 Hold</button>
-    `,
-    message: "If I could, I’d hug you right now."
+    game(el, done) {
+      el.innerHTML = `<p>Hold for a hug</p>`;
+      const b=document.createElement("button");
+      b.innerText="🤍 Hold";
+      b.onmousedown=()=>setTimeout(done,800);
+      el.appendChild(b);
+    },
+    message: "I wish I could hug you right now."
   },
   {
     title: "❤️ Valentine’s Day",
-    subtitle: "Us",
-    game: () => `
-      <button onclick="win()">Open my heart</button>
-    `,
-    message: "This wasn’t just a game. Will you be my Valentine?"
+    game(el, done) {
+      el.innerHTML = `<p>Tap everything you’ve collected</p>`;
+      const final=document.createElement("div");
+      final.innerText="🌹💍🍫🧸🤝🤗";
+      final.style.fontSize="32px";
+      final.onclick=done;
+      el.appendChild(final);
+    },
+    message: "This week was just a small version of how I feel about you. Will you be my Valentine?"
   }
 ];
 
-// change this to control the unlocked day (0–6)
-const todayIndex = Math.min(
-  Math.floor((new Date() - new Date("2026-02-07")) / 86400000),
-  days.length - 1
-);
+const container = document.getElementById("days");
+const progress = document.getElementById("progress");
 
-let currentDay = Math.max(todayIndex, 0);
-
-const titleEl = document.getElementById("dayTitle");
-const subtitleEl = document.getElementById("subtitle");
-const gameEl = document.getElementById("game");
-const btn = document.getElementById("actionBtn");
-const msg = document.getElementById("message");
-
-function loadDay() {
-  const day = days[currentDay];
-  titleEl.innerText = day.title;
-  subtitleEl.innerText = day.subtitle;
-  gameEl.innerHTML = "";
-  msg.classList.add("hidden");
-  btn.innerText = "Start";
+function save() {
+  localStorage.setItem("state", JSON.stringify(state));
 }
 
-function win() {
-  msg.innerText = days[currentDay].message;
-  msg.classList.remove("hidden");
-  btn.innerText = "Replay";
+function render() {
+  container.innerHTML="";
+  progress.innerText = `Days completed: ${state.completed.filter(Boolean).length}/7`;
+
+  days.forEach((d,i)=>{
+    const card=document.createElement("div");
+    card.className="card";
+
+    if(i<=unlocked) card.classList.add("active");
+    if(state.completed[i]) card.classList.add("done");
+
+    card.innerHTML=`<h3>${d.title}</h3>`;
+
+    if(i===unlocked && !state.completed[i]) {
+      const g=document.createElement("div");
+      g.className="game";
+      d.game(g, ()=>{
+        state.completed[i]=true;
+        save();
+        render();
+        alert(d.message);
+      });
+      card.appendChild(g);
+    }
+
+    if(state.completed[i]) {
+      const m=document.createElement("div");
+      m.className="message";
+      m.innerText=d.message;
+      card.appendChild(m);
+    }
+
+    container.appendChild(card);
+  });
 }
 
-btn.onclick = () => {
-  gameEl.innerHTML = days[currentDay].game();
-};
-
-loadDay();
+render();
 </script>
 </body>
 </html>

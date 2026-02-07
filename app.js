@@ -1024,42 +1024,65 @@ function renderKissMeter(key) {
    ========================= */
 
 function renderMemoryLane(key) {
+const MEMORY_LANE_CONFIG = [
+  {
+    src: './assets/photos/2.jpg',
+    captionA: 'Our first photo',
+    captionB: 'Our second photo',
+    correct: 'A'
+  },
+  {
+    src: './assets/photos/valentines/3.jpg',
+    captionA: 'Upvan',
+    captionB: 'Airoli Park Walk',
+    correct: 'A'
+  },
+  {
+    src: './assets/photos/valentines/4.jpg',
+    captionA: 'Our first concert',
+    captionB: 'Our only concert',
+    correct: 'A'
+  }
+];
+
+
+
+   
   gameContent.innerHTML = `
-    <div>
-      <div class="game-title">Valentine’s Day — Memory Lane</div>
-      <div class="small">Upload 3–5 photos. (You can configure the 'right' caption ahead of time.)</div>
-      <div style="height:10px"></div>
-      <input id="ml-files" type="file" accept="image/*" multiple />
-      <div style="height:10px"></div>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <button id="ml-config" class="small-btn">Configure captions (owner)</button>
-        <button id="ml-play" class="small-btn">Play Memory Lane</button>
-        <button id="ml-clear" class="small-btn">Clear saved</button>
-      </div>
-      <div id="ml-area"></div>
-    </div>
-  `;
+  <div>
+    <div class="game-title">Valentine’s Day — Memory Lane</div>
+    <p class="small">A few memories. Choose the one that feels right.</p>
+    <button id="ml-start" class="btn">Start</button>
+  </div>
+`;
+
+   document.getElementById('ml-start').addEventListener('click', async () => {
+  const photos = [];
+  for (const item of MEMORY_LANE) {
+    try {
+      const img = await loadImage(item.src);
+      photos.push({
+        img,
+        captionA: item.captionA,
+        captionB: item.captionB,
+        correct: item.correct
+      });
+    } catch (e) {
+      alert('One of the photos could not be loaded.');
+      console.error(e);
+      return;
+    }
+  }
+  playMemoryLane(photos);
+});
+
 
   const filesInput = document.getElementById('ml-files');
   const mlArea = document.getElementById('ml-area');
 
-  filesInput.addEventListener('change', async (e) => {
-    const fList = Array.from(e.target.files).slice(0,5);
-    const photos = [];
-    for (let i=0;i<fList.length;i++){
-      const d = await fileToDataUrl(fList[i]);
-      photos.push({ id: 'ml-' + i, dataUrl: d, captionA: 'Caption A', captionB: 'Caption B', correct: 'A' });
-    }
-    await idbPut({ id: 'memory-lane', photos, updatedAt: new Date().toISOString() });
-    renderMlPreview();
-  });
+  
 
-  document.getElementById('ml-config').addEventListener('click', async () => {
-    const rec = await idbGet('memory-lane');
-    if (!rec || !rec.photos || rec.photos.length === 0) {
-      alert('No photos saved yet. Upload 3–5 photos first.');
-      return;
-    }
+  
     // show configuration UI
     mlArea.innerHTML = '';
     rec.photos.forEach((p, idx) => {
@@ -1070,7 +1093,7 @@ function renderMemoryLane(key) {
       wrap.style.borderRadius='10px';
       wrap.innerHTML = `
         <div style="display:flex;gap:8px;align-items:center">
-          <div style="width:80px;height:60px;overflow:hidden;border-radius:8px"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="width:80px;height:60px;overflow:hidden;border-radius:8px"><img src="${p.img.src}">" style="width:100%;height:100%;object-fit:cover"></div>
           <div style="flex:1">
             <input data-idx="${idx}" class="ml-capA" placeholder="Caption A" value="${escapeHtml(p.captionA)}" style="width:100%;padding:6px;border-radius:8px;border:1px solid #eee" />
             <div style="height:6px"></div>
@@ -1119,29 +1142,7 @@ function renderMemoryLane(key) {
     alert('Cleared.');
   });
 
-  async function renderMlPreview() {
-    mlArea.innerHTML = '';
-    const rec = await idbGet('memory-lane');
-    if (!rec || !rec.photos) {
-      mlArea.innerHTML = `<div class="small hint">No photos saved yet.</div>`;
-      return;
-    }
-    const wrap = document.createElement('div');
-    wrap.style.display='flex';
-    wrap.style.gap='8px';
-    wrap.style.flexWrap='wrap';
-    rec.photos.forEach(p=>{
-      const el = document.createElement('div');
-      el.style.width='100px';
-      el.style.height='80px';
-      el.style.borderRadius='8px';
-      el.style.overflow='hidden';
-      el.innerHTML = `<img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover">`;
-      wrap.appendChild(el);
-    });
-    mlArea.appendChild(wrap);
-    mlArea.appendChild(document.createElement('div'));
-  }
+  
 
   (async ()=>{ await renderMlPreview(); })();
 

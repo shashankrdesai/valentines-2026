@@ -1032,13 +1032,13 @@ const MEMORY_LANE = [
     correct: 'A'
   },
   {
-    src: './assets/photos/valentines/3.jpg',
+    src: './assets/photos/3.jpeg',
     captionA: 'Upvan',
     captionB: 'Airoli Park Walk',
     correct: 'A'
   },
   {
-    src: './assets/photos/valentines/4.jpg',
+    src: './assets/photos/4.jpeg',
     captionA: 'Our first concert',
     captionB: 'Our only concert',
     correct: 'A'

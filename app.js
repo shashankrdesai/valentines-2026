@@ -1046,6 +1046,42 @@ const MEMORY_LANE_CONFIG = [
 ];
 
 
+     gameContent.innerHTML = `
+    <div>
+      <div class="game-title">Valentine’s Day — Memory Lane</div>
+      <p class="small">A few moments from us. Choose what feels right.</p>
+      <button id="ml-start" class="btn">Start</button>
+    </div>
+  `;
+
+   
+  document.getElementById('ml-start').addEventListener('click', async () => {
+    const photos = [];
+
+    // 3. LOAD IMAGES FROM REPO
+    for (const item of MEMORY_LANE) {
+      try {
+        const img = await loadImage(item.src);
+        photos.push({
+          img,
+          captionA: item.captionA,
+          captionB: item.captionB,
+          correct: item.correct
+        });
+      } catch (err) {
+        console.error(err);
+        alert('One of the photos could not be loaded.');
+        return;
+      }
+    }
+
+    // 4. START GAME
+    playMemoryLane(photos, key);
+  });
+}
+
+
+
 function playMemoryLane(photos, key) {
   let index = 0;
   let score = 0;

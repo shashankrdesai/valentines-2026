@@ -316,13 +316,15 @@ function renderPetalTap(key) {
    ========================= */
 
 function renderProposeJigsaw(key) {
-  gameContent.innerHTML = `
+  const IMAGE_URL = './assets/photos/1.jpg';
+
+   gameContent.innerHTML = `
     <div>
       <div class="game-title">Propose Day — Photo Jigsaw</div>
       <div class="small">Upload one photo. Choose grid (2×3 or 3×3). Drag tiles into place.</div>
       <div style="height:10px"></div>
 
-      <input id="pj-file" type="file" accept="image/*" />
+      
       <div style="height:10px"></div>
       <div style="display:flex;gap:8px">
         <button id="grid23" class="small-btn">2 × 3 (easy)</button>
@@ -338,30 +340,22 @@ function renderProposeJigsaw(key) {
   const board = document.getElementById('pj-board');
   let imgData = null, rows = 2, cols = 3;
 
-  file.addEventListener('change', async (ev) => {
-    const f = ev.target.files[0];
-    if (!f) return;
-    const durl = await fileToDataUrl(f);
-    imgData = await loadImage(durl);
-    await idbPut({ id: 'propose-photo', dataUrl: durl, uploadedAt: new Date().toISOString() });
-    startPuzzle();
-  });
+  
 
   document.getElementById('grid23').addEventListener('click', () => { rows=2; cols=3; startPuzzle(); });
   document.getElementById('grid33').addEventListener('click', () => { rows=3; cols=3; startPuzzle(); });
-  document.getElementById('pj-clear').addEventListener('click', async () => {
-    await idbDelete('propose-photo');
-    imgData = null;
-    board.innerHTML = '';
-  });
+  
 
-  (async ()=> {
-    const existing = await idbGet('propose-photo');
-    if (existing && existing.dataUrl) {
-      imgData = await loadImage(existing.dataUrl);
-      startPuzzle();
-    }
-  })();
+  (async () => {
+  try {
+    const img = await loadImage(IMAGE_URL);
+    imgData = img;
+    startPuzzle();
+  } catch (e) {
+    board.innerHTML = '<div class="small">Image not found.</div>';
+  }
+})();
+
 
   async function startPuzzle() {
     board.innerHTML = '';

@@ -1024,7 +1024,7 @@ function renderKissMeter(key) {
    ========================= */
 
 function renderMemoryLane(key) {
-const MEMORY_LANE_CONFIG = [
+const MEMORY_LANE = [
   {
     src: './assets/photos/2.jpg',
     captionA: 'Our first photo',

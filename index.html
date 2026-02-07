@@ -1,239 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>7 Days of Us</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Valentine’s Week</title>
+  <meta name="description" content="A small surprise that changes every day ❤️" />
+  <meta name="theme-color" content="#f8c1cc" />
 
-<style>
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-  background: linear-gradient(#ffe6ef, #fff);
-}
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 
-.app {
-  max-width: 420px;
-  margin: auto;
-  padding: 20px;
-}
-
-h1 {
-  text-align: center;
-}
-
-.days {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.card {
-  padding: 18px;
-  border-radius: 16px;
-  background: white;
-  box-shadow: 0 8px 20px rgba(0,0,0,.08);
-  opacity: .5;
-}
-
-.card.active {
-  opacity: 1;
-  border: 2px solid #ff5c8a;
-}
-
-.card.done {
-  opacity: 1;
-}
-
-button {
-  margin-top: 12px;
-  padding: 10px 16px;
-  border-radius: 999px;
-  border: none;
-  background: #ff5c8a;
-  color: white;
-}
-
-.game {
-  margin-top: 12px;
-}
-
-.rose {
-  font-size: 32px;
-  cursor: pointer;
-}
-
-.hidden {
-  display: none;
-}
-
-.message {
-  margin-top: 12px;
-  line-height: 1.5;
-}
-</style>
+  <style>
+    :root{
+      --bg1:#fff5f7;
+      --bg2:#fdecef;
+      --accent:#f0627e;
+      --muted:#6b6b6b;
+      --card:#ffffff;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;
+      background: linear-gradient(180deg,var(--bg1),var(--bg2));
+      color:#222;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-bottom:64px;
+    }
+    header{padding:24px 16px 8px;text-align:center}
+    header h1{margin:0;font-size:1.6rem}
+    header p{margin:8px 0 0;color:var(--muted)}
+    main{max-width:520px;margin:0 auto;padding:16px}
+    .day-card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:14px;
+      margin-bottom:12px;
+      box-shadow:0 8px 22px rgba(0,0,0,0.06);
+      position:relative;
+    }
+    .day-card.locked{opacity:0.5;filter:grayscale(.02)}
+    .day-row{display:flex;gap:12px;align-items:center}
+    .day-info{flex:1}
+    .day-info h2{margin:0;font-size:1.05rem}
+    .day-info p{margin:6px 0 0;color:var(--muted);font-size:.9rem}
+    button.btn{
+      background:var(--accent);color:white;border:none;padding:10px 12px;border-radius:10px;font-weight:600;
+      cursor:pointer;width:120px;
+    }
+    button.btn[disabled]{background:#ddd;color:#777;cursor:not-allowed}
+    .badge{position:absolute;right:12px;top:12px;background:#ffe1e7;color:#b0304a;padding:6px 8px;border-radius:999px;font-size:.78rem}
+    #game-modal{position:fixed;inset:0;background:rgba(0,0,0,0.48);display:none;align-items:center;justify-content:center;padding:16px;z-index:2000}
+    #game-modal.active{display:flex}
+    #game-wrap{background:white;border-radius:16px;width:100%;max-width:540px;max-height:92vh;overflow:auto;padding:12px}
+    .close-row{text-align:right}
+    .close-row button{background:none;border:none;font-size:1rem;cursor:pointer}
+    .game-title{font-size:1.1rem;margin:6px 0 12px}
+    input[type=file]{width:100%}
+    .center{display:flex;align-items:center;justify-content:center}
+    .small{font-size:.85rem;color:var(--muted)}
+    canvas.signature{border-radius:8px;border:1px dashed #eee;width:100%;height:180px;touch-action:none}
+    .row{display:flex;gap:8px}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .pill{background:#fff5f7;padding:8px 10px;border-radius:999px;color:#b0304a;font-weight:600}
+    .hint{font-size:.86rem;color:#666}
+    .small-btn{padding:8px 10px;border-radius:10px;border:1px solid #eee;background:white;cursor:pointer}
+    .file-preview{width:100%;height:240px;background:#fafafa;border-radius:10px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .file-preview img{max-width:100%;max-height:100%;object-fit:cover}
+    footer{position:fixed;left:0;right:0;bottom:10px;text-align:center;font-size:.85rem;color:var(--muted)}
+    @media (min-width:640px){
+      .day-card{padding:18px}
+      button.btn{width:160px}
+    }
+  </style>
 </head>
-
 <body>
-<div class="app">
-  <h1>💖 7 Days of Us</h1>
-  <p style="text-align:center" id="progress"></p>
+  <header>
+    <h1>Valentine’s Week ❤️</h1>
+    <p>One tiny surprise — Feb 7 → Feb 14</p>
+  </header>
 
-  <div class="days" id="days"></div>
-</div>
+  <main id="days"></main>
 
-<script>
-const START_DATE = new Date("2026-02-07"); // change if needed
-const today = new Date();
-const unlocked = Math.max(0, Math.min(
-  Math.floor((today - START_DATE) / 86400000),
-  6
-));
+  <div id="game-modal" aria-hidden="true">
+    <div id="game-wrap" role="dialog" aria-modal="true">
+      <div class="close-row">
+        <button id="closeGame">✕ Close</button>
+      </div>
+      <div id="game-content"></div>
+    </div>
+  </div>
 
-let state = JSON.parse(localStorage.getItem("state")) || {
-  completed: Array(7).fill(false),
-  petals: 0
-};
+  <footer class="small">Tip: use <code>?dev=1</code> to unlock all days for testing</footer>
 
-const days = [
-  {
-    title: "🌹 Rose Day",
-    game(el, done) {
-      el.innerHTML = `<p>Catch 3 roses</p>`;
-      let count = 0;
-      for (let i=0;i<5;i++){
-        const r = document.createElement("span");
-        r.className = "rose";
-        r.innerText = "🌹";
-        r.onclick = () => {
-          r.remove();
-          count++;
-          if(count === 3) done();
-        };
-        el.appendChild(r);
-      }
-    },
-    message: "A rose for you. Just because you exist."
-  },
-  {
-    title: "💍 Propose Day",
-    game(el, done) {
-      el.innerHTML = `<p>Choose what feels right</p>`;
-      ["☕","📘","💍"].forEach(i=>{
-        const s=document.createElement("span");
-        s.className="rose";
-        s.innerText=i;
-        s.onclick=()=> i==="💍" && done();
-        el.appendChild(s);
-      });
-    },
-    message: "Every day, I choose you."
-  },
-  {
-    title: "🍫 Chocolate Day",
-    game(el, done) {
-      el.innerHTML = `<p>Build the chocolate</p>`;
-      const b=document.createElement("button");
-      b.innerText="Mix 🍫";
-      b.onclick=done;
-      el.appendChild(b);
-    },
-    message: "Life is sweeter with you."
-  },
-  {
-    title: "🧸 Teddy Day",
-    game(el, done) {
-      el.innerHTML = `<p>Find the teddy</p>`;
-      ["📦","🪑","🧸"].sort(()=>.5-Math.random()).forEach(i=>{
-        const s=document.createElement("span");
-        s.className="rose";
-        s.innerText=i;
-        s.onclick=()=> i==="🧸" && done();
-        el.appendChild(s);
-      });
-    },
-    message: "You make me feel safe."
-  },
-  {
-    title: "🤝 Promise Day",
-    game(el, done) {
-      el.innerHTML = `<p>Tap to promise</p>`;
-      const b=document.createElement("button");
-      b.innerText="I promise";
-      b.onclick=done;
-      el.appendChild(b);
-    },
-    message: "I promise effort, honesty, and us."
-  },
-  {
-    title: "🤗 Hug Day",
-    game(el, done) {
-      el.innerHTML = `<p>Hold for a hug</p>`;
-      const b=document.createElement("button");
-      b.innerText="🤍 Hold";
-      b.onmousedown=()=>setTimeout(done,800);
-      el.appendChild(b);
-    },
-    message: "I wish I could hug you right now."
-  },
-  {
-    title: "❤️ Valentine’s Day",
-    game(el, done) {
-      el.innerHTML = `<p>Tap everything you’ve collected</p>`;
-      const final=document.createElement("div");
-      final.innerText="🌹💍🍫🧸🤝🤗";
-      final.style.fontSize="32px";
-      final.onclick=done;
-      el.appendChild(final);
-    },
-    message: "This week was just a small version of how I feel about you. Will you be my Valentine?"
-  }
-];
-
-const container = document.getElementById("days");
-const progress = document.getElementById("progress");
-
-function save() {
-  localStorage.setItem("state", JSON.stringify(state));
-}
-
-function render() {
-  container.innerHTML="";
-  progress.innerText = `Days completed: ${state.completed.filter(Boolean).length}/7`;
-
-  days.forEach((d,i)=>{
-    const card=document.createElement("div");
-    card.className="card";
-
-    if(i<=unlocked) card.classList.add("active");
-    if(state.completed[i]) card.classList.add("done");
-
-    card.innerHTML=`<h3>${d.title}</h3>`;
-
-    if(i===unlocked && !state.completed[i]) {
-      const g=document.createElement("div");
-      g.className="game";
-      d.game(g, ()=>{
-        state.completed[i]=true;
-        save();
-        render();
-        alert(d.message);
-      });
-      card.appendChild(g);
-    }
-
-    if(state.completed[i]) {
-      const m=document.createElement("div");
-      m.className="message";
-      m.innerText=d.message;
-      card.appendChild(m);
-    }
-
-    container.appendChild(card);
-  });
-}
-
-render();
-</script>
+  <script src="app.js"></script>
 </body>
 </html>

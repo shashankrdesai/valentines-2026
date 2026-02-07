@@ -1178,7 +1178,7 @@ Happy Valentine’s Day ❤️`;
     }
     ctx.fillText(line, x, yy);
   }
-}
+
 
 /* =========================
    UTIL: file -> dataURL

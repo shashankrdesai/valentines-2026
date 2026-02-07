@@ -259,8 +259,15 @@ function renderPetalTap(key) {
 
   function onTap(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+    const scaleX = canvas.width / rect.width;
+      const scaleY = canvas.height / rect.height;
+      
+      const px = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+      const py = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+      
+      const x = px * scaleX;
+      const y = py * scaleY;
+
     for (let i=petals.length-1;i>=0;i--) {
       const p = petals[i];
       const dx = p.x - x, dy = p.y - y;

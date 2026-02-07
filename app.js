@@ -466,7 +466,7 @@ function renderProposeJigsaw(key) {
         setTimeout(()=> {
           full.style.background='rgba(0,0,0,0.02)';
         },100);
-        showWin('Puzzle complete — beautiful!', 'propose');
+        showWin('So pretty 🥺 Will you be my Valentine?', 'propose');
         saveProgress('propose');
       }
     }

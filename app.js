@@ -10,14 +10,14 @@
    ========================= */
 
 const DAYS = [
-  { key: 'rose', date: '2026-02-07', title: 'Rose Day 🌹', desc: 'Petal Tap — tap petals to collect' },
-  { key: 'propose', date: '2026-02-08', title: 'Propose Day 💍', desc: 'Photo Jigsaw — upload one photo' },
-  { key: 'chocolate', date: '2026-02-09', title: 'Chocolate Day 🍫', desc: 'Chocolate Stack — stack pieces' },
+  { key: 'rose', date: '2026-02-07', title: 'Rose Day 🌹', desc: 'Tap petals to collect' },
+  { key: 'propose', date: '2026-02-08', title: 'Propose Day 💍', desc: 'Photo Jigsaw' },
+  { key: 'chocolate', date: '2026-02-09', title: 'Chocolate Day 🍫', desc: 'Stack Choccy pieces' },
   { key: 'teddy', date: '2026-02-10', title: 'Teddy Day 🧸', desc: 'Teddy Hide & Seek' },
   { key: 'promise', date: '2026-02-11', title: 'Promise Day 🤝', desc: 'Choose a promise and sign it' },
   { key: 'hug', date: '2026-02-12', title: 'Hug Day 🤗', desc: 'Hold the screen to warm' },
   { key: 'kiss', date: '2026-02-13', title: 'Kiss Day 💋', desc: 'Timing kiss meter' },
-  { key: 'valentine', date: '2026-02-14', title: 'Valentine’s Day ❤️', desc: 'Memory Lane — 3–5 photos' }
+  { key: 'valentine', date: '2026-02-14', title: 'Valentine’s Day ❤️', desc: 'Memory Lane' }
 ];
 
 const DB_NAME = 'valweek-photos';
@@ -280,7 +280,7 @@ function renderPetalTap(key) {
         // tiny circle pop
         burstAt(ctx, x, y);
         if (collected >= target) {
-          showWin('Petals collected! ❤️', key);
+          showWin('A Rose for my Rose 🌹 (since I cannot give you a real one)', key);
           saveProgress(key);
         }
         break;
@@ -1301,7 +1301,7 @@ function showWin(text, key=undefined) {
   overlay.style.background='rgba(0,0,0,0.35)'; overlay.style.zIndex=3000;
   const card = document.createElement('div');
   card.style.background='#fff'; card.style.padding='20px'; card.style.borderRadius='12px'; card.style.textAlign='center'; card.style.maxWidth='90%';
-  card.innerHTML = `<div style="font-size:1.1rem;font-weight:600;color:#b0304a">${escapeHtml(text)}</div><div style="height:12px"></div><button class="small-btn">Nice</button>`;
+  card.innerHTML = `<div style="font-size:1.1rem;font-weight:600;color:#b0304a">${escapeHtml(text)}</div><div style="height:12px"></div><button class="small-btn">Accept 🥺</button>`;
   overlay.appendChild(card);
   document.body.appendChild(overlay);
   card.querySelector('button').addEventListener('click', ()=> { overlay.remove(); });

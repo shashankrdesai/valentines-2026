@@ -1046,191 +1046,82 @@ const MEMORY_LANE_CONFIG = [
 ];
 
 
+function playMemoryLane(photos, key) {
+  let index = 0;
+  let score = 0;
 
-   
-  gameContent.innerHTML = `
-  <div>
-    <div class="game-title">Valentine’s Day — Memory Lane</div>
-    <p class="small">A few memories. Choose the one that feels right.</p>
-    <button id="ml-start" class="btn">Start</button>
-  </div>
-`;
-
-   document.getElementById('ml-start').addEventListener('click', async () => {
-  const photos = [];
-  for (const item of MEMORY_LANE) {
-    try {
-      const img = await loadImage(item.src);
-      photos.push({
-        img,
-        captionA: item.captionA,
-        captionB: item.captionB,
-        correct: item.correct
-      });
-    } catch (e) {
-      alert('One of the photos could not be loaded.');
-      console.error(e);
+  function renderSlide() {
+    if (index >= photos.length) {
+      renderFinalLetter();
+      saveProgress(key);
       return;
     }
-  }
-  playMemoryLane(photos);
-});
 
+    const p = photos[index];
 
-  const filesInput = document.getElementById('ml-files');
-  const mlArea = document.getElementById('ml-area');
+    gameContent.innerHTML = `
+      <div>
+        <div class="game-title">Memory ${index + 1} / ${photos.length}</div>
+        <div style="height:12px"></div>
 
-  
+        <div style="background:#fff;padding:12px;border-radius:12px">
+          <div style="height:220px;border-radius:10px;overflow:hidden;margin-bottom:12px">
+            <img src="${p.img.src}" style="width:100%;height:100%;object-fit:cover">
+          </div>
 
-  
-    // show configuration UI
-    mlArea.innerHTML = '';
-    rec.photos.forEach((p, idx) => {
-      const wrap = document.createElement('div');
-      wrap.style.padding='8px';
-      wrap.style.marginBottom='8px';
-      wrap.style.background='#fff';
-      wrap.style.borderRadius='10px';
-      wrap.innerHTML = `
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="width:80px;height:60px;overflow:hidden;border-radius:8px"><img src="${p.img.src}">" style="width:100%;height:100%;object-fit:cover"></div>
-          <div style="flex:1">
-            <input data-idx="${idx}" class="ml-capA" placeholder="Caption A" value="${escapeHtml(p.captionA)}" style="width:100%;padding:6px;border-radius:8px;border:1px solid #eee" />
-            <div style="height:6px"></div>
-            <input data-idx="${idx}" class="ml-capB" placeholder="Caption B" value="${escapeHtml(p.captionB)}" style="width:100%;padding:6px;border-radius:8px;border:1px solid #eee" />
-            <div style="height:6px"></div>
-            <div class="small">Set correct: 
-              <select data-idx="${idx}" class="ml-correct">
-                <option value="A" ${p.correct==='A'?'selected':''}>A</option>
-                <option value="B" ${p.correct==='B'?'selected':''}>B</option>
-              </select>
-            </div>
+          <div style="display:flex;gap:8px">
+            <button id="optA" class="small-btn">${escapeHtml(p.captionA)}</button>
+            <button id="optB" class="small-btn">${escapeHtml(p.captionB)}</button>
           </div>
         </div>
-      `;
-      mlArea.appendChild(wrap);
-    });
-    const saveBtn = document.createElement('button');
-    saveBtn.textContent = 'Save captions';
-    saveBtn.className = 'small-btn';
-    saveBtn.addEventListener('click', async () => {
-      const newPhotos = rec.photos.map((p, idx) => {
-        const capA = mlArea.querySelector(`.ml-capA[data-idx="${idx}"]`).value || 'Caption A';
-        const capB = mlArea.querySelector(`.ml-capB[data-idx="${idx}"]`).value || 'Caption B';
-        const correct = mlArea.querySelector(`.ml-correct[data-idx="${idx}"]`).value || 'A';
-        return { ...p, captionA: capA, captionB: capB, correct };
-      });
-      await idbPut({ id: 'memory-lane', photos: newPhotos, updatedAt: new Date().toISOString() });
-      alert('Saved!');
-      renderMlPreview();
-    });
-    mlArea.appendChild(saveBtn);
-  });
+      </div>
+    `;
 
-  document.getElementById('ml-play').addEventListener('click', async () => {
-    const rec = await idbGet('memory-lane');
-    if (!rec || !rec.photos || rec.photos.length < 1) {
-      alert('Upload at least 1 photo to play.');
-      return;
-    }
-    playMemory(rec.photos);
-  });
+    document.getElementById('optA').onclick = () => handleAnswer('A');
+    document.getElementById('optB').onclick = () => handleAnswer('B');
 
-  document.getElementById('ml-clear').addEventListener('click', async () => {
-    await idbDelete('memory-lane');
-    mlArea.innerHTML = '';
-    alert('Cleared.');
-  });
-
-  
-
-  (async ()=>{ await renderMlPreview(); })();
-
-  async function playMemory(photos) {
-    // simple sequential quiz
-    let score = 0;
-    let idx = 0;
-    async function showSlide() {
-      if (idx >= photos.length) {
-        // show final letter
-        const letter = generateLetter(score, photos.length);
-        gameContent.innerHTML = `
-          <div>
-            <div class="game-title">Your Letter</div>
-            <div style="height:10px"></div>
-            <div style="background:#fff;padding:12px;border-radius:12px">
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                ${photos.map(p=>`<div style="width:120px;height:80px;overflow:hidden;border-radius:8px"><img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover"></div>`).join('')}
-              </div>
-              <div style="height:12px"></div>
-              <div style="white-space:pre-wrap">${escapeHtml(letter)}</div>
-              <div style="height:12px"></div>
-              <button id="ml-download" class="small-btn">Download Letter</button>
-            </div>
-          </div>
-        `;
-        document.getElementById('ml-download').addEventListener('click', ()=> {
-          // render letter to canvas
-          const c = document.createElement('canvas');
-          c.width = 1200; c.height = 1600;
-          const ctx = c.getContext('2d');
-          ctx.fillStyle='#fff6f7'; ctx.fillRect(0,0,c.width,c.height);
-          // images at top
-          let x=40;
-          photos.forEach(p=>{
-            const img = new Image();
-            img.src = p.dataUrl;
-            // draw asynchronously when loaded
-          });
-          // draw text
-          ctx.fillStyle='#222';
-          ctx.font='28px Inter';
-          wrapTextCanvas(ctx, letter, 60, 320, c.width-120, 40);
-          // export
-          setTimeout(()=> {
-            const dataUrl = c.toDataURL('image/png');
-            downloadDataUrl(dataUrl, 'valentine-letter.png');
-          }, 300);
-        });
-        saveProgress('valentine');
-        return;
+    function handleAnswer(choice) {
+      if (choice === p.correct) {
+        score++;
       }
-      const p = photos[idx];
-      gameContent.innerHTML = `
-        <div>
-          <div class="game-title">Memory ${idx+1} / ${photos.length}</div>
-          <div style="height:8px"></div>
-          <div style="background:#fff;padding:12px;border-radius:12px">
-            <div style="height:260px;display:flex;align-items:center;justify-content:center;flex-direction:column">
-              <div style="width:90%;height:200px;border-radius:10px;overflow:hidden;filter:blur(6px)">
-                <img src="${p.dataUrl}" style="width:100%;height:100%;object-fit:cover">
-              </div>
-              <div style="height:12px"></div>
-              <div style="display:flex;gap:8px;width:100%">
-                <button class="small-btn" id="optA">${escapeHtml(p.captionA)}</button>
-                <button class="small-btn" id="optB">${escapeHtml(p.captionB)}</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-      document.getElementById('optA').addEventListener('click', () => {
-        if (p.correct === 'A') { score++; heartBurst(); }
-        idx++; setTimeout(showSlide, 300);
-      });
-      document.getElementById('optB').addEventListener('click', () => {
-        if (p.correct === 'B') { score++; heartBurst(); }
-        idx++; setTimeout(showSlide, 300);
-      });
+      index++;
+      setTimeout(renderSlide, 300);
     }
-    showSlide();
   }
 
-  function generateLetter(score,total) {
-    if (score === total) return `Perfect score (${score}/${total}) — I love how we remember the little things. Thank you for making life sweeter. — ❤️`;
-    if (score >= Math.ceil(total*0.7)) return `Great! You remembered ${score}/${total}. It means the world — here's to making more memories together.`;
-    return `You got ${score}/${total}. That's okay — let's make more memories. I love you anyway.`;
+  function renderFinalLetter() {
+    let letter;
+    if (score === photos.length) {
+      letter = `Perfect score ❤️
+
+You remember the little things.
+That’s why I love you.
+Happy Valentine’s Day.`;
+    } else if (score >= Math.ceil(photos.length * 0.6)) {
+      letter = `You got most of them right.
+
+What matters is that these moments exist —
+and that we keep making more together ❤️`;
+    } else {
+      letter = `Some memories fade,
+but what we have doesn’t.
+
+Happy Valentine’s Day ❤️`;
+    }
+
+    gameContent.innerHTML = `
+      <div>
+        <div class="game-title">For You ❤️</div>
+        <div style="background:#fff;padding:16px;border-radius:12px;white-space:pre-line">
+          ${escapeHtml(letter)}
+        </div>
+      </div>
+    `;
   }
+
+  renderSlide();
+}
+
 
   function wrapTextCanvas(ctx, text, x, y, maxW) {
     ctx.font = '28px Inter';

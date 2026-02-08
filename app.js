@@ -643,7 +643,7 @@ function renderChocolateStack(key) {
     setTimeout(physicsStep, 20);
     heightEl.textContent = bars.length;
     if (bars.length >= target) {
-      showWin('Stacked 10 bars — sweet win!');
+      showWin('🍫 for my chocolate princess!');
       saveProgress('chocolate');
     }
   }
@@ -749,7 +749,7 @@ function renderTeddyHide(key) {
     const d = Math.hypot(cx - teddy.x, cy - teddy.y);
     if (d < teddy.r + 18) {
       teddy.found = true;
-      showWin("Found him! You're the best seeker ❤️", key);
+      showWin("Found him! You're the best seeker, Arry ❤️", key);
       saveProgress(key);
     } else {
       // playful ripple
@@ -926,7 +926,7 @@ function renderVirtualHug(key) {
     if (progress >= needed) {
       cancelAnimationFrame(holdTimer);
       holdTimer = null;
-      showWin("That was a warm hug ❤️", key);
+      showWin("You give the best hugs 🥺", key);
       saveProgress(key);
       hugText.textContent = 'You did it!';
       return;
@@ -1028,13 +1028,13 @@ const MEMORY_LANE = [
   {
     src: './assets/photos/2.jpg',
     captionA: 'Our first photo',
-    captionB: 'Our second photo',
+    captionB: 'Our first time',
     correct: 'A'
   },
   {
     src: './assets/photos/3.jpeg',
     captionA: 'Upvan',
-    captionB: 'Airoli Park Walk',
+    captionB: 'Airoli Chinchawali Garden',
     correct: 'A'
   },
   {
